@@ -1,0 +1,7 @@
+{
+    "license": "GPL2",
+    "author": "Vurbia Technologies International Inc.",
+    "version": "1.0",
+    "puppetversion": "2.6",
+    "source": "https://github.com/vurbia/puppet-grok"
+}
