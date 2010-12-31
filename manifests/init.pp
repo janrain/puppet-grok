@@ -11,6 +11,53 @@
 # Sample Usage:
 #
 class grok {
+	if !$grok_version { $grok_version = "1.20101117.3112" }
+	if !$grok_unpack_root { $grok_unpack_root = "/usr/src" }
+	
+	include buildenv::c
+	
+	case $operatingsystem {
+		/(?i)(Ubuntu)/: {
+			case $lsbdistcodename {
+        		/(?i)(hardy|lucid)/: {
+					common::archive { "grok-${grok_version}":
+						ensure   => present,
+						checksum => false,
+						url      => "http://semicomplete.googlecode.com/files/grok-${grok_version}.tar.gz",
+						timeout  => 600,
+						target   => "${grok_unpack_root}",
+						notify	 => Exec["make-grok"]
+					}
 
+					package { [ "ctags", "flex", "gperf", "libevent-dev", "libpcre3-dev", "libtokyocabinet-dev" ]:
+						ensure => present
+					}
 
+					exec { "make-grok":
+						command     => "/usr/bin/make grok",
+						cwd         => "${grok_unpack_root}/grok-${grok_version}",
+						creates     => "${grok_unpack_root}/grok-${grok_version}/grok",
+						refreshonly => true,
+						notify		=> Exec["make-install-grok"],
+						require     => [ Common::Archive["grok-${grok_version}"], Package["ctags"], Package["flex"], Package["gperf"],
+						 				 Package["libevent-dev"], Package["libpcre3-dev"], Package["libtokyocabinet-dev"] ]
+					}
+
+					exec { "make-install-grok":
+						command     => "/usr/bin/make install",
+						cwd         => "${grok_unpack_root}/grok-${grok_version}",
+						creates     => "/usr/bin/grok",
+						refreshonly => true,
+						require     => Exec["make-grok"]
+					}
+				}
+				default: {
+					fail "Unsupported Ubuntu version ${lsbdistcodename} in 'grok' module"
+				}
+			}
+		}
+		default: {
+			fail "Unsupported OS ${operatingsystem} in 'grok' module"
+		}
+	}
 }
