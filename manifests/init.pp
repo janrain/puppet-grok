@@ -20,6 +20,13 @@ class grok {
 		/(?i)(Ubuntu)/: {
 			case $lsbdistcodename {
         		/(?i)(hardy|lucid)/: {
+					include buildenv::packages::ctags
+					include buildenv::packages::flex
+					include buildenv::packages::gperf
+					include buildenv::packages::libevent
+					include buildenv::packages::libpcre3
+					include buildenv::packages::tokyocabinet
+					
 					common::archive { "grok-${grok_version}":
 						ensure   => present,
 						checksum => false,
@@ -29,18 +36,15 @@ class grok {
 						notify	 => Exec["make-grok"]
 					}
 
-					package { [ "ctags", "flex", "gperf", "libevent-dev", "libpcre3-dev", "libtokyocabinet-dev" ]:
-						ensure => present
-					}
-
 					exec { "make-grok":
 						command     => "/usr/bin/make grok",
 						cwd         => "${grok_unpack_root}/grok-${grok_version}",
 						creates     => "${grok_unpack_root}/grok-${grok_version}/grok",
 						refreshonly => true,
 						notify		=> Exec["make-install-grok"],
-						require     => [ Common::Archive["grok-${grok_version}"], Package["ctags"], Package["flex"], Package["gperf"],
-						 				 Package["libevent-dev"], Package["libpcre3-dev"], Package["libtokyocabinet-dev"] ]
+						require     => [ Common::Archive["grok-${grok_version}"], Class["buildenv::c"], Class["buildenv::packages::ctags"],
+										 Class["buildenv::packages::flex"], Class["buildenv::packages::gperf"], Class["buildenv::packages::libevent"],
+										 Class["buildenv::packages::libpcre3"], Class["buildenv::packages::tokyocabinet"] ]
 					}
 
 					exec { "make-install-grok":
