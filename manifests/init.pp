@@ -15,7 +15,7 @@ class grok {
 	include buildenv::c
 	
 	case $operatingsystem {
-		/(?i)(Ubuntu)/: {
+		/(?i)(Ubuntu|Debian)/: {
 			case $lsbdistcodename {
         		/(?i)(hardy|lucid|maverick|natty)/: {
 					include buildenv::packages::ctags
