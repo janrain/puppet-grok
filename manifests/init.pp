@@ -17,7 +17,7 @@ class grok {
 	case $operatingsystem {
 		/(?i)(Ubuntu)/: {
 			case $lsbdistcodename {
-        		/(?i)(hardy|lucid)/: {
+        		/(?i)(hardy|lucid|maverick|natty)/: {
 					include buildenv::packages::ctags
 					include buildenv::packages::flex
 					include buildenv::packages::gperf
